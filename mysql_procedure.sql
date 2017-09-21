@@ -65,5 +65,3 @@ SET @start_date = DATE_ADD(@start_date, INTERVAL 1 DAY);
 END WHILE;       
 END$$
 call WhileLoop();
-
-
