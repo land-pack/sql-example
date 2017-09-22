@@ -94,3 +94,68 @@ WHERE f_inout in (1, 14) AND  f_crtime between "2017-08-12" AND "2017-09-14"
 GROUP BY f_uid, dated)a)b
 GROUP BY tags, dated)c
 GROUP BY c.tags;
+
+
+# query accodring the user level (which decide the recharge moneys)
+
+# query vip ~ user numbers
+SELECT b.tags, count(f_uid) as users, sum(moneys) as moneys
+FROM (
+# query ..
+SELECT *, CASE 
+    WHEN moneys BETWEEN 0 AND 100 then 'vip1'
+    WHEN moneys BETWEEN 100 AND 500 then 'vip2'
+    WHEN moneys BETWEEN 500 AND 1500 then 'vip3'
+    WHEN moneys BETWEEN 1500 AND 3500 then 'vip4'
+    WHEN moneys BETWEEN 3500 AND 50000 then 'vip5'
+    ELSE 'vip6'  END as tags
+FROM (
+SELECT f_uid, sum(f_money) as moneys
+FROM t_diamond_recharge
+WHERE f_orderstatus=1 AND f_crtime BETWEEN "2017-02-20" AND "2017-09-21"
+GROUP BY f_uid)a)b
+GROUP BY b.tags;
+
+
+# query user exchange 
+SELECT sum(f_consum) as totals
+FROM t_exchangetkt_order
+WHERE f_orderstatus > -1 AND f_consum_type=3 AND f_crtime BETWEEN "2017-02-20" AND "2017-09-21" AND f_uid in (
+SELECT f_uid
+FROM (
+# query ..
+SELECT *, CASE 
+    WHEN moneys BETWEEN 0 AND 100 then 'vip1'
+    WHEN moneys BETWEEN 100 AND 500 then 'vip2'
+    WHEN moneys BETWEEN 500 AND 1500 then 'vip3'
+    WHEN moneys BETWEEN 1500 AND 3500 then 'vip4'
+    WHEN moneys BETWEEN 3500 AND 50000 then 'vip5'
+    ELSE 'vip6'  END as tags
+FROM (
+SELECT f_uid, sum(f_money) as moneys
+FROM t_diamond_recharge
+WHERE f_orderstatus=1 AND f_crtime BETWEEN "2017-02-20" AND "2017-09-21" 
+GROUP BY f_uid)a)b WHERE b.tags='vip6');
+
+
+# query user gold log
+SELECT sum(f_golds) as golds
+FROM t_gold_log
+WHERE f_inout in (2, 15) AND f_crtime BETWEEN "2017-02-20" AND "2017-09-21"  AND f_uid in (
+SELECT f_uid
+FROM (
+# query ..
+SELECT *, CASE 
+    WHEN moneys BETWEEN 0 AND 100 then 'vip1'
+    WHEN moneys BETWEEN 100 AND 500 then 'vip2'
+    WHEN moneys BETWEEN 500 AND 1500 then 'vip3'
+    WHEN moneys BETWEEN 1500 AND 3500 then 'vip4'
+    WHEN moneys BETWEEN 3500 AND 50000 then 'vip5'
+    ELSE 'vip6'  END as tags
+FROM (
+SELECT f_uid, sum(f_money) as moneys
+FROM t_diamond_recharge
+WHERE f_orderstatus=1 AND f_crtime BETWEEN "2017-02-20" AND "2017-09-21"
+GROUP BY f_uid)a)b WHERE b.tags='vip1')
+GROUP BY f_inout;
+
