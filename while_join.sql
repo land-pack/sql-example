@@ -68,5 +68,12 @@ WHERE DATE(f_logtime) BETWEEN DATE_SUB("2017-08-17", INTERVAL 15 DAY) AND DATE_S
 GROUP BY f_uid;
 
 
-
+try
+	execute(sql)
+	commit
+catch:
+	rollback
+else:
+	#success
+	update_to_redis
 #=======================
