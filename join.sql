@@ -89,3 +89,24 @@ INNER JOIN
 t_gold_account ga
 ON ga.f_uid=tu.f_uid
 WHERE f_level > 0;
+
+
+# use join to merge multi data to one table
+SELECT a.f_uid, a.f_username, a.f_regtime,b.first_time,b.first_money
+FROM (
+SELECT f_uid, f_username, f_regtime
+FROM t_user 
+WHERE f_uid in (1102802,1132903,1225783,1246853,1098154))a
+INNER JOIN 
+# first recharge time
+(SELECT f_uid, f_crtime as first_time, f_money as first_money 
+FROM t_diamond_recharge WHERE 
+f_oid in (
+		SELECT i.min_oid as f_oid 
+        FROM (SELECT f_uid, min(f_oid) as min_oid
+				FROM t_diamond_recharge 
+				WHERE f_uid in (1102802,1132903,1225783,1246853,1098154) AND f_orderstatus=1
+				GROUP BY f_uid)i
+))b
+ON a.f_uid = b.f_uid;
+

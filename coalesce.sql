@@ -1,0 +1,2 @@
+SELECT a_uid, a_name, b_money, coalesce(c.logid, 100001) as logid
+from ( select a.uid as a_uid, a.name as a_name, b.money as b_money from (select * from user)a  inner join (select * from account)b  on a.uid=b.uid)d LEFT JOIN (select uid, sum(logid) as logid from login_log GROUP BY uid)c  ON d.a_uid=c.uid;
